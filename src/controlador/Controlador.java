@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bson.Document;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -18,6 +19,7 @@ import com.mongodb.client.MongoDatabase;
 import dao.DAO;
 import inputAsker.InputAsker;
 import model.Empleado;
+import model.Incidencia;
 
 public class Controlador {
 	
@@ -71,10 +73,17 @@ public class Controlador {
     	Iterator<Document> iterator = findIterable.iterator();
     	while(iterator.hasNext()) {
     		Document document = iterator.next();
-    		document.remove("_id");
+    		//document.remove("_id");
     		Map<String,Object> mapa = new HashMap<>(document);
-    		System.out.println(Arrays.toString(mapa.entrySet().toArray()));
+//    		System.out.println(Arrays.toString(mapa.entrySet().toArray()));
+//    		
+    		Incidencia i = new Incidencia();
+    		i.setTipo((String) mapa.get("tipo"));
+    		i.setObjeto((String) mapa.get("objeto"));
+    		i.setDestinatario((String) mapa.get("destinatario"));
     		
+    		System.out.println(i);
+    	
     	}
     	dao.disconnect();
     	
@@ -82,8 +91,14 @@ public class Controlador {
 
    
     public void getIncidenciaByDestino() {
-    	
-    	
+    	dao.connect();
+    	MongoDatabase db = dao.getDName();
+    	MongoCollection<Document> coleccion2 = db.getCollection("Incidencia");
+    	DBObject dbo =  coleccion2.find().first()
+    	String tipo = (String) dbo.get("tipo");
+    	int remitente = (int) dbo.get("remitente");
+    	System.out.println(tipo + " " + remitente);
+    	dao.disconnect();
     }
 
 

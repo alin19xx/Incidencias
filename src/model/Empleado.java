@@ -45,9 +45,10 @@ public class Empleado extends Codificable{
 		this.nombre = nombre;
 		this.password = password;
 	}
+	
 
 	public Empleado() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
