@@ -11,12 +11,26 @@ import java.util.List;
  *
  * @author alexlin
  */
-public class Empleado {
-	int idEmpleado;
-	String usuario;
-	String nombre;
-	String password;
-	List<Incidencia> incidencias;
+public class Empleado extends Codificable{
+	private int idEmpleado;
+	private String usuario;
+	private String nombre;
+	private String password;
+	private List<Incidencia> incidencias;
+
+	/**
+	 * @return the incidencias
+	 */
+	public List<Incidencia> getIncidencias() {
+		return incidencias;
+	}
+
+	/**
+	 * @param incidencias the incidencias to set
+	 */
+	public void setIncidencias(List<Incidencia> incidencias) {
+		this.incidencias = incidencias;
+	}
 
 	/**
 	 * @param idEmpleado
@@ -31,12 +45,10 @@ public class Empleado {
 		this.nombre = nombre;
 		this.password = password;
 	}
-	
+
 	public Empleado() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 	/**
 	 * @param incidencias

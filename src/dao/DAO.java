@@ -6,6 +6,10 @@
 package dao;
 
 import java.util.List;
+
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
+
 import model.Empleado;
 import model.Evento;
 import model.Incidencia;
@@ -16,6 +20,26 @@ import model.RankingTO;
  * @author alexlin
  */
 public class DAO implements iDAO{
+	
+	MongoClient mongoClient;
+	MongoDatabase mongoDatabase;
+	final String host = "localhost";
+	final int port = 27017;
+	final String dbName = "Incidencias";
+	
+	public void connect() {
+		mongoClient = new MongoClient(host, port);
+		mongoDatabase = mongoClient.getDatabase(dbName);
+	}
+	
+	public void disconnect() {
+		mongoClient.close();
+	}
+	
+	public MongoDatabase getDName() {
+		return mongoDatabase;
+	}
+	
 
     @Override
     public void insertEmpleado(Empleado e) {
