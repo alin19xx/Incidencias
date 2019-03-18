@@ -5,6 +5,10 @@
  */
 package model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -18,8 +22,8 @@ public class Incidencia{
 	private String objeto;
 	private String tipo;
 	private Empleado destinatario;
-	private Date fechaInicio;
-	private Date fechaFin;
+	private LocalDateTime fechaInicio;
+	private LocalDateTime fechaFin;
 	
 	
 	
@@ -40,7 +44,7 @@ public class Incidencia{
 	 * @param fechaFin
 	 */
 	public Incidencia(String codigo, int id, Empleado remitente, String objeto, String tipo, Empleado destinatario,
-			Date fechaInicio, Date fechaFin) {
+			LocalDateTime fechaInicio, LocalDateTime fechaFin) {
 //		super(codigo);
 		this.id = id;
 		this.remitente = remitente;
@@ -55,8 +59,9 @@ public class Incidencia{
 	 */
 	@Override
 	public String toString() {
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		return "Incidencia [id=" + id + ", remitente=" + remitente + ", objeto=" + objeto + ", tipo=" + tipo
-				+ ", destinatario=" + destinatario + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + "]";
+				+ ", destinatario=" + destinatario + ", fechaInicio=" + fechaInicio.format(dateFormat) + ", fechaFin=" + fechaFin + "]";
 	}
 	public Incidencia() {
 		// TODO Auto-generated constructor stub
@@ -124,26 +129,26 @@ public class Incidencia{
 	/**
 	 * @return the fechaInicio
 	 */
-	public Date getFechaInicio() {
+	public LocalDateTime getFechaInicio() {
 		return fechaInicio;
 	}
 	/**
-	 * @param fechaInicio the fechaInicio to set
+	 * @param date the fechaInicio to set
 	 */
-	public void setFechaInicio(Date fechaInicio) {
-		this.fechaInicio = fechaInicio;
+	public void setFechaInicio(LocalDateTime date) {
+		this.fechaInicio = date;
 	}
 	/**
 	 * @return the fechaFin
 	 */
-	public Date getFechaFin() {
+	public LocalDateTime getFechaFin() {
 		return fechaFin;
 	}
 	/**
-	 * @param fechaFin the fechaFin to set
+	 * @param date the fechaFin to set
 	 */
-	public void setFechaFin(Date fechaFin) {
-		this.fechaFin = fechaFin;
+	public void setFechaFin(LocalDateTime date) {
+		this.fechaFin = date;
 	}
 
 	

@@ -12,25 +12,19 @@ import java.util.List;
  * @author alexlin
  */
 public class Empleado extends Codificable{
-	private int idEmpleado;
 	private String usuario;
 	private String nombre;
 	private String password;
-	private List<Incidencia> incidencias;
 
-	/**
-	 * @return the incidencias
-	 */
-	public List<Incidencia> getIncidencias() {
-		return incidencias;
-	}
 
 	/**
 	 * @param incidencias the incidencias to set
 	 */
-	public void setIncidencias(List<Incidencia> incidencias) {
-		this.incidencias = incidencias;
-	}
+//	public void setIncidencias(List<Incidencia> incidencias) {
+//		this.incidencias = incidencias;
+//	}
+	
+	
 
 	/**
 	 * @param idEmpleado
@@ -38,9 +32,8 @@ public class Empleado extends Codificable{
 	 * @param nombre
 	 * @param password
 	 */
-	public Empleado(int idEmpleado, String usuario, String nombre, String password) {
+	public Empleado( String usuario, String nombre, String password) {
 		super();
-		this.idEmpleado = idEmpleado;
 		this.usuario = usuario;
 		this.nombre = nombre;
 		this.password = password;
@@ -54,24 +47,14 @@ public class Empleado extends Codificable{
 	/**
 	 * @param incidencias
 	 */
-	public Empleado(List<Incidencia> incidencias) {
-		super();
-		this.incidencias = incidencias;
-	}
+//	public Empleado(List<Incidencia> incidencias) {
+//		super();
+//		this.incidencias = incidencias;
+//	}
 
-	/**
-	 * @return the idEmpleado
-	 */
-	public int getIdEmpleado() {
-		return idEmpleado;
-	}
+	
 
-	/**
-	 * @param idEmpleado the idEmpleado to set
-	 */
-	public void setIdEmpleado(int idEmpleado) {
-		this.idEmpleado = idEmpleado;
-	}
+	
 
 	/**
 	 * @return the usuario
@@ -117,7 +100,7 @@ public class Empleado extends Codificable{
 
 	@Override
 	public String toString() {
-		return "Empleado [idEmpleado=" + idEmpleado + ", usuario=" + usuario + ", nombre=" + nombre + ", password="
+		return "Empleado [usuario=" + usuario + ", nombre=" + nombre + ", password="
 				+ password + "]";
 	}
 

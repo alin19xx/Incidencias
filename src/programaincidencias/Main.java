@@ -108,7 +108,7 @@ public class Main {
                      break;
                  }
                 case 7: {
-                    controlador.getIncidenciaByDestino();
+                    //controlador.getIncidenciaByDestino();
                      break;
                  }
                 case 8: {
