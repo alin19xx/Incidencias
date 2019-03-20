@@ -15,9 +15,9 @@ import java.util.Date;
  *
  * @author alexlin
  */
-public class Incidencia{
+public class Incidencia extends Codificable{
 
-	private int id;
+	private String id;
 	private Empleado remitente;
 	private String objeto;
 	private String tipo;
@@ -30,9 +30,9 @@ public class Incidencia{
 	/**
 	 * @param codigo
 	 */
-//	public Incidencia(String codigo) {
-//		super(codigo);
-//	}
+	public Incidencia(String codigo) {
+		super(codigo);
+	}
 	/**
 	 * @param codigo
 	 * @param id
@@ -43,7 +43,7 @@ public class Incidencia{
 	 * @param fechaInicio
 	 * @param fechaFin
 	 */
-	public Incidencia(String codigo, int id, Empleado remitente, String objeto, String tipo, Empleado destinatario,
+	public Incidencia(String codigo, String id, Empleado remitente, String objeto, String tipo, Empleado destinatario,
 			LocalDateTime fechaInicio, LocalDateTime fechaFin) {
 //		super(codigo);
 		this.id = id;
@@ -69,13 +69,13 @@ public class Incidencia{
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	/**
