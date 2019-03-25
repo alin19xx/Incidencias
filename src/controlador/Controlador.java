@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,7 @@ public class Controlador {
 	// MongoDatabase db = mongoClient.getDatabase("Incidencias");
 	public InputAsker inputAsker = new InputAsker();
 	public DAO dao = new DAO();
+	public static Empleado empleado = new Empleado("","","");
 
 	public void insertEmpleado() {
 		dao.connect();
@@ -77,13 +79,12 @@ public class Controlador {
 		Empleado elDestinatario = null;
 		String comentario = InputAsker.pedirCadena("Introduce el comentario");
 		for (int i = 0; i < listaEmpleados.size(); i++) {
-			System.out.println(i +1 + ". " + listaEmpleados.get(i));
+			System.out.println((i) + ". " + listaEmpleados.get(i));
 			
 		}
 		
 		while(confirmado) {
 			destinatario = InputAsker.pedirEntero("Elige el destinatario");
-			 
 			if(destinatario<=0 || destinatario > listaEmpleados.size()) {
 				System.out.println("error: Choose a correct numbaer from 1 to "+listaEmpleados.size());
 			}else {
@@ -100,15 +101,18 @@ public class Controlador {
 			tipoIncidencia = "urgente";
 		}
 		Empleado objetoEmpleado = (Empleado) listaEmpleados.get(destinatario);
-		Empleado empleado = new Empleado();
-		//BasicDBObject dbEmpleado = new BasicDBObject();
-		empleado.setNombre("alin");
 		
+		//BasicDBObject dbEmpleado = new BasicDBObject();
+		empleado.getUsuario();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		String fecha = dateFormat.format(new Date());
 		Document doc = new Document();
-		doc.append("remitente", empleado.getNombre());
+		doc.append("remitente", empleado.getUsuario());
 		doc.append("objeto", comentario);
+		doc.append("dateIncio", fecha);
+		doc.append("dateFin", "");
 		doc.append("tipo", tipoIncidencia);
-		doc.append("destinatario", objetoEmpleado.getCodigo());
+		doc.append("destinatario", objetoEmpleado.getUsuario());
 		coleccion.insertOne(doc);
 		System.out.println("Incidencia introducida correctamente");
 		dao.disconnect();
@@ -141,9 +145,9 @@ public class Controlador {
 	public List bringBackIncidencias() {
 		dao.connect();
 		MongoDatabase db = dao.getDName();
-		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy",
-		// Locale.ENGLISH);
+//		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//		String fecha = dateFormat.format(new Date());
+
 		MongoCollection<Document> coleccion2 = db.getCollection("Incidencia");
 		FindIterable findIterable = coleccion2.find();
 		Iterator<Document> iterator = findIterable.iterator();
@@ -154,7 +158,8 @@ public class Controlador {
 			// document.remove("_id");
 			Map<String, Object> mapa = new HashMap<>(document);
 			// System.out.println(Arrays.toString(mapa.entrySet().toArray()));
-
+			
+			
 			Empleado e1 = new Empleado();
 			Empleado e2 = new Empleado();
 			String username = (String) mapa.get("remitente");
@@ -162,14 +167,15 @@ public class Controlador {
 			e1 = getEmpleadoByUsername(username);
 			e2 = getEmpleadoByUsername(username2);
 			String fechaString = (String) mapa.get("dateInicio");
-			LocalDateTime date = LocalDateTime.parse(fechaString, dateFormat);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+			LocalDateTime localDate = LocalDateTime.parse(fechaString, formatter);
 			Incidencia i = new Incidencia();
 			i.setTipo((String) mapa.get("tipo"));
 			i.setObjeto((String) mapa.get("objeto"));
 			i.setRemitente(e1);
 			i.setDestinatario(e2);
-			i.setFechaInicio(date);
-			i.setFechaFin(date);
+			i.setFechaInicio(localDate);
+			i.setFechaFin(null);
 			incidencias.add(i);
 
 		}
@@ -178,14 +184,14 @@ public class Controlador {
 
 	}
 
-	public List bringBackEmpleados() {
+	public List<Empleado> bringBackEmpleados() {
 
 		dao.connect();
 		MongoDatabase db = dao.getDName();
 		MongoCollection<Document> coleccion2 = db.getCollection("Empleado");
 		FindIterable findIterable = coleccion2.find();
 		Iterator<Document> iterator = findIterable.iterator();
-		List empleados = new ArrayList<>();
+		List<Empleado> empleados = new ArrayList<>();
 		while (iterator.hasNext()) {
 			Document document = iterator.next();
 			Map<String, Object> mapa = new HashMap<>(document);
@@ -267,6 +273,25 @@ public class Controlador {
 
 	public void getRankingEmpleados() {
 
+	}
+	
+	public boolean statusLogin() {
+		dao.connect();
+		MongoDatabase db = dao.getDName();
+		List<Empleado> empleados = bringBackEmpleados();
+		boolean status = false;
+		String usuario = InputAsker.pedirCadena("Introduce el nombre de usuario");
+		String pass = InputAsker.pedirCadena("Introduce la contraseña");
+		for(int i = 0; i < empleados.size(); i++) {
+			if(usuario.equals(empleados.get(i).getUsuario()) && pass.equals(empleados.get(i).getPassword())) {
+				empleado.setNombre(empleados.get(i).getNombre());
+				empleado.setUsuario(usuario);
+				empleado.setPassword(pass);
+				status = true;
+			}
+		}
+		
+		return status;
 	}
 
 }

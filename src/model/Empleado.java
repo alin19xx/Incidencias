@@ -15,7 +15,7 @@ public class Empleado extends Codificable{
 	private String usuario;
 	private String nombre;
 	private String password;
-
+	
 
 	/**
 	 * @param incidencias the incidencias to set
