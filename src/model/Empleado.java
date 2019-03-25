@@ -100,8 +100,7 @@ public class Empleado extends Codificable{
 
 	@Override
 	public String toString() {
-		return "Empleado [usuario=" + usuario + ", nombre=" + nombre + ", password="
-				+ password + "]";
+		return "Empleado [usuario=" + usuario + ", nombre=" + nombre + "]";
 	}
 
 }

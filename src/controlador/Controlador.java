@@ -66,23 +66,52 @@ public class Controlador {
 	public void insertIncidencia() {
 		dao.connect();
 		MongoDatabase db = dao.getDName();
+		int destinatario = 0;
+		boolean confirmado = true;
+		String tipoIncidencia = "";
 		MongoCollection<Document> coleccion = db.getCollection("Incidencia");
 		List listaEmpleados = new ArrayList<>();
 		listaEmpleados = bringBackEmpleados();
 		System.out.println("*****  REGISTRO  *****");
 		Empleado usuarioLogueado = new Empleado();
+		Empleado elDestinatario = null;
 		String comentario = InputAsker.pedirCadena("Introduce el comentario");
 		for (int i = 0; i < listaEmpleados.size(); i++) {
-
+			System.out.println(i +1 + ". " + listaEmpleados.get(i));
+			
 		}
-
-		String pass = InputAsker.pedirCadena("Introduce la contraseña");
+		
+		while(confirmado) {
+			destinatario = InputAsker.pedirEntero("Elige el destinatario");
+			 
+			if(destinatario<=0 || destinatario > listaEmpleados.size()) {
+				System.out.println("error: Choose a correct numbaer from 1 to "+listaEmpleados.size());
+			}else {
+			
+				confirmado = false;
+			}
+		}
+		int tipo = InputAsker.pedirEntero("Elige el tipo de Incidencia\n"
+				+ "Pulsa 1 para normal\n"
+				+ "Pulsa 2 para urgente");
+		if(tipo == 1) {
+			tipoIncidencia = "normal";
+		}else {
+			tipoIncidencia = "urgente";
+		}
+		Empleado objetoEmpleado = (Empleado) listaEmpleados.get(destinatario);
 		Empleado empleado = new Empleado();
-		// BasicDBObject dbEmpleado = new BasicDBObject();
-		Document doc = new Document("usuario", empleado.getCodigo()).append("nombre", nombre).append("pass", pass);
+		//BasicDBObject dbEmpleado = new BasicDBObject();
+		empleado.setNombre("alin");
+		
+		Document doc = new Document();
+		doc.append("remitente", empleado.getNombre());
+		doc.append("objeto", comentario);
+		doc.append("tipo", tipoIncidencia);
+		doc.append("destinatario", objetoEmpleado.getCodigo());
 		coleccion.insertOne(doc);
-		System.out.println("Empleado introducido correctamente");
-
+		System.out.println("Incidencia introducida correctamente");
+		dao.disconnect();
 	}
 
 	public void getIncidenciaById() {
