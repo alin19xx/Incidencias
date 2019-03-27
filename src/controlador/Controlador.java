@@ -35,7 +35,7 @@ public class Controlador {
 	// MongoDatabase db = mongoClient.getDatabase("Incidencias");
 	public InputAsker inputAsker = new InputAsker();
 	public DAO dao = new DAO();
-	public static Empleado empleado = new Empleado("","","");
+	public static Empleado empleado = new Empleado("", "", "");
 
 	public void insertEmpleado() {
 		dao.connect();
@@ -80,36 +80,37 @@ public class Controlador {
 		String comentario = InputAsker.pedirCadena("Introduce el comentario");
 		for (int i = 0; i < listaEmpleados.size(); i++) {
 			System.out.println((i) + ". " + listaEmpleados.get(i));
-			
+
 		}
-		
-		while(confirmado) {
+
+		while (confirmado) {
 			destinatario = InputAsker.pedirEntero("Elige el destinatario");
-			if(destinatario<=0 || destinatario > listaEmpleados.size()) {
-				System.out.println("error: Choose a correct numbaer from 1 to "+listaEmpleados.size());
-			}else {
-			
+			if (destinatario < 0 || destinatario > listaEmpleados.size()) {
+				System.out.println("error: Choose a correct numbaer from 0 to " + listaEmpleados.size());
+			} else {
+
 				confirmado = false;
 			}
 		}
-		int tipo = InputAsker.pedirEntero("Elige el tipo de Incidencia\n"
-				+ "Pulsa 1 para normal\n"
-				+ "Pulsa 2 para urgente");
-		if(tipo == 1) {
+		int tipo = InputAsker
+				.pedirEntero("Elige el tipo de Incidencia\n" + "Pulsa 1 para normal\n" + "Pulsa 2 para urgente");
+		if (tipo == 1) {
 			tipoIncidencia = "normal";
-		}else {
+		} else {
 			tipoIncidencia = "urgente";
 		}
 		Empleado objetoEmpleado = (Empleado) listaEmpleados.get(destinatario);
-		
-		//BasicDBObject dbEmpleado = new BasicDBObject();
+
+		// BasicDBObject dbEmpleado = new BasicDBObject();
 		empleado.getUsuario();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		Incidencia incidencia = new Incidencia();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 		String fecha = dateFormat.format(new Date());
 		Document doc = new Document();
+		doc.append("idIncidencia", incidencia.getCodigo());
 		doc.append("remitente", empleado.getUsuario());
 		doc.append("objeto", comentario);
-		doc.append("dateIncio", fecha);
+		doc.append("dateInicio", fecha);
 		doc.append("dateFin", "");
 		doc.append("tipo", tipoIncidencia);
 		doc.append("destinatario", objetoEmpleado.getUsuario());
@@ -118,16 +119,26 @@ public class Controlador {
 		dao.disconnect();
 	}
 
+	/*
+	 * Metodo que muestra una Incidencia a partir de su ID
+	 */
 	public void getIncidenciaById() {
-		String nombre = InputAsker.pedirCadena("Introduce el origen");
-		List<Incidencia> incidencias = new ArrayList<>();
-		incidencias = bringBackIncidencias();
-		for (int i = 0; i < incidencias.size(); i++) {
-			if (incidencias.get(i).getRemitente().getUsuario().equalsIgnoreCase(nombre)) {
-				System.out.println(incidencias.get(i));
-			}
-		}
+		dao.connect();
+		MongoDatabase db = dao.getDName();
+		boolean confirmado = true;
+		int nrIncidenica = 0;
 
+		List<Incidencia> incidencias = new ArrayList<>();
+
+		incidencias = bringBackIncidencias();
+
+		for (int i = 0; i < incidencias.size(); i++) {
+			System.out.println((i) + ". " + incidencias.get(i).getId());
+
+		}
+		nrIncidenica = InputAsker.pedirEntero("Introduce el id de la incidencia");
+		System.out.println(incidencias.get(nrIncidenica));
+		dao.disconnect();
 	}
 
 	/*
@@ -158,15 +169,14 @@ public class Controlador {
 			// document.remove("_id");
 			Map<String, Object> mapa = new HashMap<>(document);
 			// System.out.println(Arrays.toString(mapa.entrySet().toArray()));
-			
-			
+
 			Empleado e1 = new Empleado();
 			Empleado e2 = new Empleado();
 			String username = (String) mapa.get("remitente");
 			String username2 = (String) mapa.get("destinatario");
 			e1 = getEmpleadoByUsername(username);
 			e2 = getEmpleadoByUsername(username2);
-			String fechaString = (String) mapa.get("dateInicio");
+			String fechaString = mapa.get("dateInicio").toString();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 			LocalDateTime localDate = LocalDateTime.parse(fechaString, formatter);
 			Incidencia i = new Incidencia();
@@ -176,6 +186,7 @@ public class Controlador {
 			i.setDestinatario(e2);
 			i.setFechaInicio(localDate);
 			i.setFechaFin(null);
+			i.setId(mapa.get("idIncidencia").toString());
 			incidencias.add(i);
 
 		}
@@ -240,25 +251,38 @@ public class Controlador {
 	}
 
 	public void getIncidenciaByDestino() {
-		String nombre = InputAsker.pedirCadena("Introduce el destinatario");
+		String nombre = InputAsker.pedirCadena("Introduce el id del destinatario");
 		List<Incidencia> incidencias = new ArrayList<>();
+		List<Incidencia> listPorDestino = new ArrayList<>();
 		incidencias = bringBackIncidencias();
 		for (int i = 0; i < incidencias.size(); i++) {
 			if (incidencias.get(i).getDestinatario().getUsuario().equalsIgnoreCase(nombre)) {
-				System.out.println(incidencias.get(i));
+				listPorDestino.add(incidencias.get(i));
 			}
+		}
+		if(listPorDestino.size()!=0) {
+			listPorDestino.forEach(System.out::println);
+		}else {
+			System.out.println("No hay incidencias con este destinatario");
 		}
 
 	}
 
 	public void getIncidenciaByOrigen() {
-		String nombre = InputAsker.pedirCadena("Introduce el origen");
+		String nombre = InputAsker.pedirCadena("Introduce el id del origen");
 		List<Incidencia> incidencias = new ArrayList<>();
+		List<Incidencia> listPorOrigen = new ArrayList<>();
+		
 		incidencias = bringBackIncidencias();
 		for (int i = 0; i < incidencias.size(); i++) {
 			if (incidencias.get(i).getRemitente().getUsuario().equalsIgnoreCase(nombre)) {
-				System.out.println(incidencias.get(i));
+				listPorOrigen.add(incidencias.get(i));
 			}
+		}
+		if(listPorOrigen.size()!=0) {
+			listPorOrigen.forEach(System.out::println);
+		}else {
+			System.out.println("No hay incidencias con este origen");
 		}
 
 	}
@@ -274,7 +298,7 @@ public class Controlador {
 	public void getRankingEmpleados() {
 
 	}
-	
+
 	public boolean statusLogin() {
 		dao.connect();
 		MongoDatabase db = dao.getDName();
@@ -282,15 +306,15 @@ public class Controlador {
 		boolean status = false;
 		String usuario = InputAsker.pedirCadena("Introduce el nombre de usuario");
 		String pass = InputAsker.pedirCadena("Introduce la contraseña");
-		for(int i = 0; i < empleados.size(); i++) {
-			if(usuario.equals(empleados.get(i).getUsuario()) && pass.equals(empleados.get(i).getPassword())) {
+		for (int i = 0; i < empleados.size(); i++) {
+			if (usuario.equals(empleados.get(i).getUsuario()) && pass.equals(empleados.get(i).getPassword())) {
 				empleado.setNombre(empleados.get(i).getNombre());
 				empleado.setUsuario(usuario);
 				empleado.setPassword(pass);
 				status = true;
 			}
 		}
-		
+
 		return status;
 	}
 
