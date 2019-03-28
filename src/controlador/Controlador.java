@@ -27,6 +27,7 @@ import com.mongodb.client.MongoDatabase;
 import dao.DAO;
 import inputAsker.InputAsker;
 import model.Empleado;
+import model.Evento;
 import model.Incidencia;
 
 public class Controlador {
@@ -97,6 +98,7 @@ public class Controlador {
 		if (tipo == 1) {
 			tipoIncidencia = "normal";
 		} else {
+			insertarEvento(2, empleado.getUsuario());
 			tipoIncidencia = "urgente";
 		}
 		Empleado objetoEmpleado = (Empleado) listaEmpleados.get(destinatario);
@@ -257,12 +259,14 @@ public class Controlador {
 		incidencias = bringBackIncidencias();
 		for (int i = 0; i < incidencias.size(); i++) {
 			if (incidencias.get(i).getDestinatario().getUsuario().equalsIgnoreCase(nombre)) {
+				
 				listPorDestino.add(incidencias.get(i));
 			}
 		}
-		if(listPorDestino.size()!=0) {
+		if (listPorDestino.size() != 0) {
+			insertarEvento(3, nombre);
 			listPorDestino.forEach(System.out::println);
-		}else {
+		} else {
 			System.out.println("No hay incidencias con este destinatario");
 		}
 
@@ -272,22 +276,53 @@ public class Controlador {
 		String nombre = InputAsker.pedirCadena("Introduce el id del origen");
 		List<Incidencia> incidencias = new ArrayList<>();
 		List<Incidencia> listPorOrigen = new ArrayList<>();
-		
+
 		incidencias = bringBackIncidencias();
 		for (int i = 0; i < incidencias.size(); i++) {
 			if (incidencias.get(i).getRemitente().getUsuario().equalsIgnoreCase(nombre)) {
 				listPorOrigen.add(incidencias.get(i));
 			}
 		}
-		if(listPorOrigen.size()!=0) {
+		if (listPorOrigen.size() != 0) {
 			listPorOrigen.forEach(System.out::println);
-		}else {
+		} else {
 			System.out.println("No hay incidencias con este origen");
 		}
 
 	}
 
-	public void insertarEvento() {
+	public void insertarEvento(int numEvento, String usuario) {
+		dao.connect();
+		MongoDatabase db = dao.getDName();
+		MongoCollection<Document> coleccion = db.getCollection("Evento");
+		Evento evento = new Evento();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		String fecha = dateFormat.format(new Date());
+		Document doc = new Document();
+		String accion;
+		switch (numEvento) {
+		case 1:
+			accion = "Login con usuario: " + empleado.getUsuario();
+			doc.append("usuario", empleado.getUsuario());
+			doc.append("accion", accion);
+			doc.append("date", fecha);
+			coleccion.insertOne(doc);
+			break;
+		case 2:
+			accion = "Incidencia urgente de: " + empleado.getUsuario();
+			doc.append("usuario", empleado.getUsuario());
+			doc.append("accion", accion);
+			doc.append("date", fecha);
+			coleccion.insertOne(doc);
+			break;
+		case 3:
+			accion = "Consulta de incidencias con destinatario: " + usuario;
+			doc.append("usuario", empleado.getUsuario());
+			doc.append("accion", accion);
+			doc.append("date", fecha);
+			coleccion.insertOne(doc);
+			break;
+		}
 
 	}
 
@@ -311,6 +346,7 @@ public class Controlador {
 				empleado.setNombre(empleados.get(i).getNombre());
 				empleado.setUsuario(usuario);
 				empleado.setPassword(pass);
+				insertarEvento(1, empleado.getUsuario());
 				status = true;
 			}
 		}

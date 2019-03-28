@@ -120,7 +120,7 @@ public class Main {
 				break;
 			}
 			case 9: {
-				controlador.insertarEvento();
+				//controlador.insertarEvento();
 				break;
 			}
 			case 10: {
