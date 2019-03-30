@@ -1,25 +1,19 @@
 package controlador;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.bson.Document;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -106,7 +100,7 @@ public class Controlador {
 		// BasicDBObject dbEmpleado = new BasicDBObject();
 		empleado.getUsuario();
 		Incidencia incidencia = new Incidencia();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String fecha = dateFormat.format(new Date());
 		Document doc = new Document();
 		doc.append("idIncidencia", incidencia.getCodigo());
@@ -221,6 +215,31 @@ public class Controlador {
 		}
 		return empleados;
 	}
+	
+	public List<Evento> bringBackEventos() {
+
+		dao.connect();
+		MongoDatabase db = dao.getDName();
+		MongoCollection<Document> coleccion2 = db.getCollection("Evento");
+		FindIterable findIterable = coleccion2.find();
+		Iterator<Document> iterator = findIterable.iterator();
+		List<Evento> eventos = new ArrayList<>();
+		while (iterator.hasNext()) {
+			Document document = iterator.next();
+			Map<String, Object> mapa = new HashMap<>(document);
+			Evento e1 = new Evento();
+			String usuario = (String) mapa.get("usuario");
+			String accion = (String) mapa.get("accion");
+			String date = (String) mapa.get("date");
+
+			e1.setUsuario(usuario);
+			e1.setAccion(accion);
+			e1.setDate(date);
+			eventos.add(e1);
+
+		}
+		return eventos;
+	}
 
 	/*
 	 * Metodo que nos devuelve un empleado a traves de su nombre de usuario.
@@ -296,7 +315,7 @@ public class Controlador {
 		MongoDatabase db = dao.getDName();
 		MongoCollection<Document> coleccion = db.getCollection("Evento");
 		Evento evento = new Evento();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String fecha = dateFormat.format(new Date());
 		Document doc = new Document();
 		String accion;
@@ -327,10 +346,52 @@ public class Controlador {
 	}
 
 	public void getUltimoInicioSesion() {
+		List<Empleado> empleados = new ArrayList<>();
+		List<Evento> eventos = new ArrayList<>();
+		eventos = bringBackEventos();
+		empleados = bringBackEmpleados();
+		
+		for (int i = 0; i < empleados.size(); i++) {
+			System.out.println(i+".- " + empleados.get(i).getNombre());
+		}
+		int seleccionado = InputAsker.pedirEntero("Elige el empleado para ver el ultimo inicio de sesion: ");
+		ArrayList<Evento> listadoFiltrado = new ArrayList<>();
+		
+	
+//		Collections.sort(eventos, new Comparator<Evento>() {
+//			  public int compare(Evento o1, Evento o2) {
+//			      return o1.getDate().compareTo(o2.getDate());
+//			  }
+//			});
+		
+		Empleado selected = empleados.get(seleccionado);
+		
+		for (int i = 0; i < eventos.size(); i++) {
+			if (eventos.get(i).getUsuario().equalsIgnoreCase(selected.getUsuario())) {
+				if (eventos.get(i).getAccion().contains("Login")) {
+					listadoFiltrado.add(eventos.get(i));
+				}
+			}
+		}
+		Collections.sort(listadoFiltrado);
+
+		System.out.println(listadoFiltrado.get(listadoFiltrado.size()-1));
+		listadoFiltrado.clear();
 
 	}
 
 	public void getRankingEmpleados() {
+		dao.connect();
+		MongoDatabase db = dao.getDName();
+		List<Evento> eventos = bringBackEventos();
+		List<Evento> eventoUrgente = new ArrayList<>();
+		for(int i = 0; i < eventos.size(); i++) {
+			if(eventos.get(i).getAccion().contains("urgente")) {
+				eventoUrgente.add(eventos.get(i));
+			}
+		}
+		eventoUrgente.forEach(System.out::println);
+				
 
 	}
 
@@ -350,7 +411,6 @@ public class Controlador {
 				status = true;
 			}
 		}
-
 		return status;
 	}
 
